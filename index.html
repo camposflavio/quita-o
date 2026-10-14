@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Quitação do Financiamento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: painel de premissas fixo à esquerda, resultados à direita; vira uma coluna no celular */
+:root{
+  --bg:#EEF1F4; --surface:#FFFFFF; --surface-2:#F6F8FA; --ink:#13202C; --muted:#5A6776; --line:#D9DFE5;
+  --accent:#1F5FAD; --accent-soft:#E2EBF7;
+  --s-base:#7F8A96; --s-amort:#1F5FAD; --s-inv:#B26F05; --s-hib:#25804F;
+  --good:#25804F; --good-soft:#E1F1E8; --warn:#A8620A;
+  --f-display:'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+  --f-body:'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+  --f-mono:'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0E141A; --surface:#151E27; --surface-2:#1A2530; --ink:#E5EBF1; --muted:#97A4B1; --line:#283543;
+  --accent:#73A6EA; --accent-soft:#1A2B3F;
+  --s-base:#8995A1; --s-amort:#73A6EA; --s-inv:#E5A43C; --s-hib:#58C28C;
+  --good:#58C28C; --good-soft:#163024; --warn:#E5A43C; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0E141A; --surface:#151E27; --surface-2:#1A2530; --ink:#E5EBF1; --muted:#97A4B1; --line:#283543;
+  --accent:#73A6EA; --accent-soft:#1A2B3F;
+  --s-base:#8995A1; --s-amort:#73A6EA; --s-inv:#E5A43C; --s-hib:#58C28C;
+  --good:#58C28C; --good-soft:#163024; --warn:#E5A43C; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:24px 48px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;margin-bottom:20px}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(26px,4vw,36px);line-height:1.1;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.sub{color:var(--muted);margin:6px 0 0;max-width:62ch}
+.contract{display:flex;flex-wrap:wrap;gap:6px 18px;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.contract b{color:var(--ink);font-weight:500}
+.grid{display:grid;grid-template-columns:330px minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+aside.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:4px 16px 16px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);max-height:calc(100vh - 24px);overflow:auto}
+@media (max-width:900px){aside.panel{position:static;max-height:none}}
+fieldset{border:0;border-top:1px solid var(--line);margin:0;padding:14px 0 6px;display:grid;gap:10px}
+fieldset:first-of-type{border-top:0}
+legend{font-family:var(--f-display);font-weight:600;font-size:15px;padding:0;margin-bottom:2px;float:left;width:100%}
+.f{display:grid;gap:3px}
+.f label{font-size:12.5px;font-weight:500}
+.f .hint{font-size:11.5px;color:var(--muted);line-height:1.35}
+.f input[type=number],.f select{width:100%;font:inherit;font-family:var(--f-mono);font-size:13px;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:7px 9px}
+.f input:focus-visible,.f select:focus-visible,button:focus-visible,.chk input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.chk{display:flex;gap:8px;align-items:flex-start;font-size:12.5px}
+.chk input{margin-top:3px;accent-color:var(--accent)}
+.btn{font:inherit;font-size:12.5px;font-weight:500;background:transparent;color:var(--accent);border:1px solid var(--accent);border-radius:6px;padding:6px 10px;cursor:pointer}
+.btn:hover{background:var(--accent-soft)}
+main{display:grid;gap:20px;min-width:0}
+.insight{background:var(--accent-soft);border-radius:10px;padding:14px 16px;font-size:15px;line-height:1.5}
+.insight b{font-weight:600}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:1100px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:480px){.cards{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:grid;gap:8px;align-content:start;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.card[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.card .nm{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13.5px}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.card .ds{font-size:12px;color:var(--muted);min-height:3.9em;line-height:1.3}
+.card .big{font-family:var(--f-display);font-weight:700;font-size:26px;line-height:1}
+.card .big small{font-family:var(--f-body);font-weight:400;font-size:12px;color:var(--muted);margin-left:4px}
+.kv{display:grid;gap:3px;font-size:12px;border-top:1px solid var(--line);padding-top:8px}
+.kv div{display:flex;justify-content:space-between;gap:8px}
+.kv span:first-child{color:var(--muted)}
+.kv span:last-child{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.badges{display:flex;flex-wrap:wrap;gap:4px;min-height:20px}
+.badge{font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:99px;background:var(--good-soft);color:var(--good)}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+.box h2{font-family:var(--f-display);font-weight:600;font-size:18px;margin:0 0 4px}
+.box .lead{color:var(--muted);margin:0 0 12px;font-size:13px;max-width:72ch}
+.chartbar{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:16px;height:0;border-top:2.5px solid currentColor}
+.legend i.dash{border-top-style:dashed}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{font:inherit;font-size:12px;background:transparent;color:var(--muted);border:0;padding:5px 10px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+.chart{position:relative;width:100%}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart text{font-family:var(--f-mono);font-size:11px;fill:var(--muted)}
+.tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12px;box-shadow:0 4px 16px rgba(0,0,0,.12);min-width:180px;z-index:2}
+.tip .t{font-weight:600;margin-bottom:4px}
+.tip div.r{display:flex;justify-content:space-between;gap:12px}
+.tip div.r span:last-child{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.goal{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-end}
+.goal .f{width:150px}
+.goal .out{font-size:15px;flex:1;min-width:220px}
+.goal .out b{font-family:var(--f-display);font-size:22px;font-weight:700}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:640px}
+th,td{padding:7px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-weight:600;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+th:first-child,td:first-child{text-align:left}
+td{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+tr.done td{color:var(--good);font-weight:500}
+.notes{font-size:12.5px;color:var(--muted);display:grid;gap:6px}
+.notes p{margin:0;max-width:90ch}
+.notes a{color:var(--accent)}
+@media (prefers-reduced-motion:no-preference){.card{transition:border-color .15s, box-shadow .15s}}
+/* faixa do siricotico */
+.band{--b-bg:#13202C;--b-fg:#F3F6F9;--b-mut:#A9B6C3;--b-hi:#FFC94D;--b-line:#2C3B4A;
+  background:var(--b-bg);color:var(--b-fg);border-radius:14px;padding:18px 20px 16px;margin-bottom:20px;position:relative;overflow:hidden}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .band{--b-bg:#1D2D3E;--b-line:#34485C} }
+:root[data-theme="dark"] .band{--b-bg:#1D2D3E;--b-line:#34485C}
+.band-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 16px;margin-bottom:10px}
+.band-tag{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--b-hi)}
+.band-nav{display:flex;align-items:center;gap:6px}
+.band-nav button{font:inherit;width:32px;height:32px;border-radius:50%;border:1px solid var(--b-line);background:transparent;color:var(--b-fg);cursor:pointer;font-size:15px;line-height:1}
+.band-nav button:hover{border-color:var(--b-fg)}
+.band-dots{display:flex;gap:6px;margin-inline:6px}
+.band-dots button{width:8px;height:8px;padding:0;border-radius:50%;border:0;background:var(--b-line);cursor:pointer}
+.band-dots button[aria-current="true"]{background:var(--b-hi);width:22px;border-radius:99px}
+.band-track{display:grid}
+.slide{grid-area:1/1;display:grid;gap:6px;align-content:start;min-height:128px}
+.slide[hidden]{display:none!important}
+@media (prefers-reduced-motion:no-preference){.slide{animation:slideIn .45s ease both}}
+@keyframes slideIn{from{opacity:.25;transform:translateX(14px)}to{opacity:1;transform:none}}
+.slide .k{font-size:14px;color:var(--b-mut)}
+.slide .h{font-family:var(--f-display);font-weight:700;font-size:clamp(28px,5vw,48px);line-height:1.05;letter-spacing:-.015em;text-wrap:balance}
+.slide .h em{font-style:normal;color:var(--b-hi)}
+.slide .s{font-size:14.5px;color:var(--b-mut);max-width:70ch}
+.slide .s b{color:var(--b-fg);font-weight:600}
+.calc{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
+.calc label{font-family:var(--f-display);font-weight:700;font-size:clamp(22px,3.6vw,34px);line-height:1.1}
+.calc .money{display:flex;align-items:center;gap:6px;border-bottom:2px solid var(--b-hi);padding-bottom:2px}
+.calc .money span{font-family:var(--f-display);font-weight:700;font-size:clamp(22px,3.6vw,34px);color:var(--b-hi)}
+.calc input{width:7ch;background:transparent;border:0;color:var(--b-hi);font-family:var(--f-display);font-weight:700;font-size:clamp(22px,3.6vw,34px);padding:0}
+.calc input:focus-visible{outline:2px dashed var(--b-hi);outline-offset:4px}
+.prog{height:12px;border-radius:99px;background:var(--b-line);overflow:hidden;max-width:560px;margin-top:6px}
+.prog i{display:block;height:100%;background:var(--b-hi);border-radius:99px}
+.band-bar{height:3px;background:var(--b-line);border-radius:99px;margin-top:12px;overflow:hidden}
+.band-bar i{display:block;height:100%;width:0;background:var(--b-hi)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Quitação do Financiamento</h1>
+      <p class="sub">Simule quando a dívida acaba e qual destino para o dinheiro livre deixa a família com mais patrimônio. Todas as estratégias usam o mesmo dinheiro por mês; só muda para onde ele vai.</p>
+    </div>
+    <div class="contract">
+      <span>Tabela <b>SAC</b></span>
+      <span>Financiado <b>R$ 250.200</b></span>
+      <span>Prazo <b>420 meses</b></span>
+      <span>Juros <b>8,5101% a.a. + TR</b></span>
+    </div>
+  </header>
+
+  <section class="band" id="band" aria-roledescription="carrossel" aria-label="Olhar quando o siricotico de gastar bater">
+    <div class="band-top">
+      <div class="band-tag">Olhar quando o siricotico de gastar bater</div>
+      <div class="band-nav">
+        <button type="button" id="bPrev" aria-label="Anterior">&#8249;</button>
+        <div class="band-dots" id="bDots"></div>
+        <button type="button" id="bNext" aria-label="Próximo">&#8250;</button>
+      </div>
+    </div>
+    <div class="band-track" id="bTrack">
+      <div class="slide" data-i="0">
+        <div class="k">Dia da liberdade, seguindo o plano <span id="b0plan"></span></div>
+        <div class="h">A casa é de vocês em <em id="b0data"></em></div>
+        <div class="s">Faltam <b id="b0meses"></b>. Cada escolha de hoje empurra essa data para frente ou para trás.</div>
+      </div>
+      <div class="slide" data-i="1" hidden>
+        <div class="calc">
+          <label for="gasto">Essa compra custa</label>
+          <div class="money"><span>R$</span><input type="number" id="gasto" min="0" step="50" value="500" inputmode="decimal"></div>
+        </div>
+        <div class="s" id="b1txt" aria-live="polite"></div>
+      </div>
+      <div class="slide" data-i="2" hidden>
+        <div class="k">Gastar R$ 1.000 por impulso hoje, em vez de amortizar</div>
+        <div class="h">Custa <em id="b2j"></em> de juros até o fim</div>
+        <div class="s" id="b2s"></div>
+      </div>
+      <div class="slide" data-i="3" hidden>
+        <div class="k">Juros que o plano tira do bolso do banco e deixa no de vocês</div>
+        <div class="h"><em id="b3"></em> a menos de juros</div>
+        <div class="s">Comparado a pagar só a parcela até <span id="b3fim"></span>. Isso compra muita coisa depois, com a casa quitada.</div>
+      </div>
+      <div class="slide" data-i="4" hidden>
+        <div class="k">Do valor financiado de R$ 250.200</div>
+        <div class="h">Já são <em id="b4p"></em> quitados</div>
+        <div class="prog"><i id="b4bar"></i></div>
+        <div class="s" id="b4s"></div>
+      </div>
+    </div>
+    <div class="band-bar"><i id="bBar"></i></div>
+  </section>
+
+  <div class="grid">
+    <aside class="panel" id="panel" aria-label="Premissas"></aside>
+
+    <main>
+      <div class="insight" id="insight"></div>
+
+      <div class="cards" id="cards"></div>
+
+      <section class="box">
+        <div class="chartbar">
+          <div>
+            <h2>Saldo devedor mês a mês</h2>
+          </div>
+          <div class="seg" role="group" aria-label="Período do gráfico">
+            <button type="button" id="z-quit" aria-pressed="true">Até quitar</button>
+            <button type="button" id="z-all" aria-pressed="false">Prazo inteiro</button>
+          </div>
+        </div>
+        <div class="legend" id="legend1"></div>
+        <div class="chart" id="chart1"></div>
+      </section>
+
+      <section class="box">
+        <h2>Custo da dívida x rendimento do investimento</h2>
+        <p class="lead">Enquanto a linha do investimento (líquida de IR) fica acima do custo da dívida, investir rende mais que amortizar. Quando ela cruza para baixo, cada real amortizado passa a valer mais. É essa regra que a estratégia híbrida segue.</p>
+        <div class="legend" id="legend2"></div>
+        <div class="chart" id="chart2"></div>
+      </section>
+
+      <section class="box">
+        <h2>Meta de quitação</h2>
+        <p class="lead">Quanto seria preciso colocar por mês, amortizando todo mês, para quitar no prazo que vocês querem. Considera o 13º, o FGTS e a queda da parcela conforme configurado ao lado.</p>
+        <div class="goal">
+          <div class="f">
+            <label for="meta">Quitar em até (anos)</label>
+            <input type="number" id="meta" min="1" max="29" step="1" value="5">
+          </div>
+          <div class="out" id="metaOut"></div>
+        </div>
+      </section>
+
+      <section class="box">
+        <div class="chartbar">
+          <h2>Ano a ano</h2>
+          <div class="seg" role="group" aria-label="Estratégia da tabela" id="tabSeg"></div>
+        </div>
+        <div class="tablewrap"><table id="tbl"></table></div>
+      </section>
+
+      <section class="box notes">
+        <h2 style="color:var(--ink)">Como o simulador calcula</h2>
+        <p>Mês 1 é a parcela de nov/2026. Todo mês o saldo é corrigido pela TR, os juros são 8,5101% ÷ 12 sobre o saldo corrigido e a amortização SAC é o saldo dividido pelos meses restantes. Ao amortizar com a opção "reduzir prazo", o valor da amortização mensal se mantém e o prazo encurta.</p>
+        <p>Orçamento fixo: o valor disponível todo mês é a parcela inicial + o aporte. Como a parcela SAC cai com o tempo, a diferença também vira dinheiro livre (desligue a opção ao lado se preferir usar só o aporte). Depois de quitar, todo o orçamento vai para investimento, por isso o patrimônio em X anos é a comparação justa entre as estratégias.</p>
+        <p>Selic: trajetória do Boletim Focus (13,75% no fim de 2026, 12,00% em 2027 e 10,50% em 2028), interpolada mês a mês. CDI = Selic − 0,10. TR: parte de 0,169% a.m. (set/2026) e cai linearmente até o valor de longo prazo em dez/2028; a referência padrão de 0,068% a.m. é a média de 2024, quando a Selic ficou entre 10,5% e 12,25%. FGTS rende 3% a.a. + TR (sem distribuição de lucros).</p>
+        <p>Valores a validar: seguros e taxas do boleto, percentual do CDI que o banco oferece em LCI/LCA, saldo e regras de uso do FGTS no contrato. Projeção, não recomendação de investimento.</p>
+        <p>Fontes: <a href="https://www.meusdividendos.com/indicadores/selic" target="_blank" rel="noopener">Selic (Meus Dividendos/BCB)</a> · <a href="https://www.dgabc.com.br/Noticia/4345650/selic-no-fim-de-2026-continua-em-13-75-pela-quinta-semana-seguida-aponta-focus" target="_blank" rel="noopener">Focus (DGABC)</a> · <a href="https://www.yahii.com.br/indices/tr.php" target="_blank" rel="noopener">TR histórica (Yahii/BCB)</a></p>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+(function(){
+const DEF={saldo:237097.95,meses:346,taxa:8.5101,seguro:0,modo:'prazo',
+  aporte:2000,reaj:0,reaplica:true,extraAnual:0,mesExtra:12,reserva:10000,usarReserva:0,
+  usaFgts:false,fgtsSaldo:0,fgtsDep:0,fgtsInicio:1,
+  s26:13.75,s27:12,s28:10.5,pctCDI:90,isento:true,ir:15,tr0:0.169,trLP:0.068,horiz:10};
+const MESES=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const STRATS=[
+  {id:'base',nm:'Só a parcela',ds:'Paga a parcela normal e investe todo o dinheiro livre.',c:'--s-base'},
+  {id:'amort',nm:'Amortizar todo mês',ds:'Todo o dinheiro livre vai direto para o saldo devedor.',c:'--s-amort'},
+  {id:'invest',nm:'Investir e quitar',ds:'Investe o dinheiro livre e quita de uma vez quando ele cobrir o saldo.',c:'--s-inv'},
+  {id:'hib',nm:'Híbrido',ds:'Investe enquanto rende mais que a dívida. Quando deixa de render, joga tudo no saldo.',c:'--s-hib'}
+];
+const SCHEMA=[
+ {g:'Financiamento',f:[
+  {k:'saldo',l:'Saldo devedor (R$)',step:0.01},
+  {row:[{k:'meses',l:'Meses restantes',step:1},{k:'taxa',l:'Juros nominais (% a.a.)',step:0.0001}]},
+  {k:'seguro',l:'Seguros e taxas (R$/mês)',step:1,h:'MIP, DFI e taxa de administração do boleto. A validar no boleto; deixe 0 se não souber.'},
+  {k:'modo',l:'Ao amortizar, reduzir',sel:[['prazo','Prazo (recomendado)'],['parcela','Parcela']]}
+ ]},
+ {g:'Dinheiro da família',f:[
+  {row:[{k:'aporte',l:'Aporte mensal (R$)',step:50},{k:'reaj',l:'Aumento do aporte (% ao ano)',step:0.5}]},
+  {k:'reaplica',chk:'Somar ao dinheiro livre o que a parcela cair (orçamento fixo)'},
+  {row:[{k:'extraAnual',l:'Extra anual, ex.: 13º (R$)',step:100},{k:'mesExtra',l:'Mês do extra',sel:MESES.map((m,i)=>[String(i+1),m])}]},
+  {row:[{k:'reserva',l:'Reserva atual (R$)',step:500},{k:'usarReserva',l:'Usar da reserva já (R$)',step:500}]}
+ ]},
+ {g:'FGTS',f:[
+  {k:'usaFgts',chk:'Usar FGTS para amortizar a cada 2 anos'},
+  {row:[{k:'fgtsSaldo',l:'Saldo FGTS hoje (R$)',step:100},{k:'fgtsDep',l:'Depósito mensal (R$)',step:10}]},
+  {k:'fgtsInicio',l:'Mês do 1º uso (1 = nov/26)',step:1,h:'Somando os dois titulares, se ambos forem compradores. Regras e prazo de carência a validar com o banco.'}
+ ]},
+ {g:'Cenário econômico',f:[
+  {row3:[{k:'s26',l:'Selic dez/26',step:0.25},{k:'s27',l:'dez/27',step:0.25},{k:'s28',l:'dez/28+',step:0.25}]},
+  {row:[{k:'pctCDI',l:'Investimento (% do CDI)',step:1},{k:'ir',l:'Alíquota de IR (%)',step:2.5}]},
+  {k:'isento',chk:'Investimento isento de IR (LCI, LCA)'},
+  {row:[{k:'tr0',l:'TR hoje (% a.m.)',step:0.001},{k:'trLP',l:'TR a partir de 2029 (% a.m.)',step:0.001}]}
+ ]},
+ {g:'Comparação',f:[
+  {k:'horiz',l:'Comparar patrimônio em (anos)',step:1,h:'Patrimônio = investimentos + reserva + FGTS − saldo devedor.'}
+ ]}
+];
+
+let P=load(); let zoom='quit'; let tabStrat='amort';
+function load(){ try{const s=JSON.parse(localStorage.getItem('quitacao-v1')||'null'); if(s) return Object.assign({},DEF,s);}catch(e){} return Object.assign({},DEF); }
+function save(){ try{localStorage.setItem('quitacao-v1',JSON.stringify(P));}catch(e){} }
+
+/* ---------- painel ---------- */
+const panel=document.getElementById('panel');
+function fieldHTML(d){
+  if(d.row) return '<div class="row2">'+d.row.map(fieldHTML).join('')+'</div>';
+  if(d.row3) return '<div class="row3">'+d.row3.map(fieldHTML).join('')+'</div>';
+  if(d.chk) return '<label class="chk"><input type="checkbox" id="in-'+d.k+'"> <span>'+d.chk+'</span></label>';
+  let inp = d.sel ? '<select id="in-'+d.k+'">'+d.sel.map(o=>'<option value="'+o[0]+'">'+o[1]+'</option>').join('')+'</select>'
+                  : '<input type="number" id="in-'+d.k+'" step="'+d.step+'" inputmode="decimal">';
+  return '<div class="f"><label for="in-'+d.k+'">'+d.l+'</label>'+inp+(d.h?'<div class="hint">'+d.h+'</div>':'')+'</div>';
+}
+panel.innerHTML=SCHEMA.map(g=>'<fieldset><legend>'+g.g+'</legend>'+g.f.map(fieldHTML).join('')+'</fieldset>').join('')
+  +'<div style="padding-top:8px"><button type="button" class="btn" id="reset">Voltar aos valores do contrato</button></div>';
+function fillInputs(){
+  Object.keys(DEF).forEach(k=>{const el=document.getElementById('in-'+k); if(!el) return;
+    if(el.type==='checkbox') el.checked=!!P[k]; else el.value=String(P[k]);});
+}
+fillInputs();
+panel.addEventListener('input',e=>{
+  const el=e.target; if(!el.id||!el.id.startsWith('in-')) return; const k=el.id.slice(3);
+  if(el.type==='checkbox') P[k]=el.checked;
+  else if(k==='modo') P[k]=el.value;
+  else { const v=parseFloat(el.value); if(isNaN(v)) return; P[k]=v; }
+  save(); render();
+});
+document.getElementById('reset').addEventListener('click',()=>{P=Object.assign({},DEF); save(); fillInputs(); render();});
+
+/* ---------- modelo ---------- */
+function dateOf(k){const t=10+(k-1);return {y:2026+Math.floor(t/12),m:((t%12)+12)%12};}
+function dLabel(k){const d=dateOf(k);return MESES[d.m]+'/'+String(d.y).slice(2);}
+function selicAt(p,k){ if(k<=2) return p.s26; if(k<=14) return p.s26+(p.s27-p.s26)*(k-2)/12; if(k<=26) return p.s27+(p.s28-p.s27)*(k-14)/12; return p.s28; }
+function trAt(p,k){ const f=Math.min(1,Math.max(0,k)/26); return Math.max(0,p.tr0+(p.trLP-p.tr0)*f)/100; }
+function invRateAt(p,k){ const cdi=Math.max(0,selicAt(p,k)-0.10); let y=cdi*p.pctCDI/100; if(!p.isento) y*=1-p.ir/100; return Math.pow(1+y/100,1/12)-1; }
+
+function sim(p,strat,N,aporteOverride){
+  const i=p.taxa/100/12, aporteBase=aporteOverride!=null?aporteOverride:p.aporte;
+  let B=Math.max(0,p.saldo), rem=Math.max(1,Math.round(p.meses)), inv=0, res=Math.max(0,p.reserva), fg=Math.max(0,p.fgtsSaldo);
+  let lastA=B/rem;
+  const useRes=Math.max(0,Math.min(p.usarReserva,res,B)); res-=useRes; B-=useRes;
+  if(useRes>0 && p.modo==='prazo' && B>0) rem=Math.max(1,Math.ceil(B/lastA-1e-9));
+  const B1=p.saldo*(1+trAt(p,1)); const parcela0=B1/Math.max(1,p.meses)+B1*i+p.seguro;
+  let juros=0,seg=0,pagoBanco=useRes,payoff=B<=0.005?0:null; const rows=[];
+  for(let k=1;k<=N;k++){
+    const tr=trAt(p,k), ri=invRateAt(p,k), custo=(1+i)*(1+tr)-1;
+    inv*=1+ri; res*=1+ri; fg=fg*(1+Math.pow(1.03,1/12)-1+tr)+Math.max(0,p.fgtsDep);
+    let J=0,A=0,parc=0,ext=0,fgu=0;
+    if(B>0.005){ B*=1+tr; J=B*i; A=Math.min(B,B/rem); parc=A+J+p.seguro; B-=A; rem=Math.max(1,rem-1); juros+=J; seg+=p.seguro; lastA=A; pagoBanco+=parc; }
+    const aporte=aporteBase*Math.pow(1+p.reaj/100,Math.floor((k-1)/12));
+    let cash = p.reaplica ? Math.max(0,parcela0+aporte-parc) : (parc>0? aporte : aporte+parcela0);
+    if(p.extraAnual>0 && dateOf(k).m===(p.mesExtra-1)) cash+=p.extraAnual;
+    if(p.usaFgts && B>0.005 && k>=p.fgtsInicio && (k-p.fgtsInicio)%24===0){ fgu=Math.min(fg,B); B-=fgu; fg-=fgu; pagoBanco+=fgu; }
+    if(B>0.005){
+      if(strat==='amort'){ ext=Math.min(cash,B); B-=ext; inv+=cash-ext; }
+      else if(strat==='invest'){ inv+=cash; if(inv>=B){ ext=B; inv-=B; B=0; } }
+      else if(strat==='hib'){
+        if(ri<custo){ const tot=inv+cash; ext=Math.min(tot,B); B-=ext; inv=tot-ext; }
+        else { inv+=cash; if(inv>=B){ ext=B; inv-=B; B=0; } }
+      } else inv+=cash;
+    } else inv+=cash;
+    pagoBanco+=ext;
+    if(B<=0.005) B=0;
+    else if((ext>0||fgu>0) && p.modo==='prazo') rem=Math.max(1,Math.ceil(B/lastA-1e-9));
+    if(B===0 && payoff===null) payoff=k;
+    rows.push({k,parc,J,A,ext,fgu,B,inv,res,fg,ri,custo,cash});
+  }
+  return {strat,rows,payoff,juros,seg,pagoBanco,parcela0};
+}
+function horizonN(p){ return Math.max(Math.round(p.horiz)*12, Math.round(p.meses)+24, 60); }
+function nwAt(r,H){ const x=r.rows[Math.min(H,r.rows.length)-1]; return x.inv+x.res+x.fg-x.B; }
+
+/* ---------- formatação ---------- */
+const brl=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0});
+const brl2=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:2,maximumFractionDigits:2});
+const pct=v=>(v*100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'%';
+function dur(m){ const a=Math.floor(m/12), r=m%12; const s=[]; if(a) s.push(a+(a>1?' anos':' ano')); if(r) s.push(r+(r>1?' meses':' mês')); return s.join(' e ')||'0 mês'; }
+const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+/* ---------- gráficos ---------- */
+function niceStep(range,count){ const raw=range/count, mag=Math.pow(10,Math.floor(Math.log10(raw))), n=raw/mag; return (n<1.5?1:n<3?2:n<7?5:10)*mag; }
+function lineChart(host,opt){
+  const W=Math.max(300,host.clientWidth||600), H=W<520?240:300, m={l:W<520?52:64,r:14,t:12,b:30};
+  const iw=W-m.l-m.r, ih=H-m.t-m.b;
+  const x=k=>m.l+(k-opt.x0)/(opt.x1-opt.x0)*iw, y=v=>m.t+ih-(v-opt.y0)/(opt.y1-opt.y0)*ih;
+  let s='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" role="img" aria-label="'+opt.aria+'">';
+  const st=niceStep(opt.y1-opt.y0,5);
+  for(let v=Math.ceil(opt.y0/st)*st; v<=opt.y1+1e-9; v+=st){
+    s+='<line x1="'+m.l+'" x2="'+(W-m.r)+'" y1="'+y(v)+'" y2="'+y(v)+'" stroke="var(--line)" stroke-width="1"/>';
+    s+='<text x="'+(m.l-8)+'" y="'+(y(v)+4)+'" text-anchor="end">'+opt.yFmt(v)+'</text>';
+  }
+  const span=opt.x1-opt.x0, every=span>240?5:span>120?2:1;
+  for(let k=opt.x0;k<=opt.x1;k++){ const d=dateOf(k); if(d.m===0 && d.y%every===0){
+    s+='<line x1="'+x(k)+'" x2="'+x(k)+'" y1="'+(m.t+ih)+'" y2="'+(m.t+ih+4)+'" stroke="var(--muted)"/>';
+    s+='<text x="'+x(k)+'" y="'+(m.t+ih+18)+'" text-anchor="middle">'+d.y+'</text>'; } }
+  s+='<line x1="'+m.l+'" x2="'+(W-m.r)+'" y1="'+(m.t+ih)+'" y2="'+(m.t+ih)+'" stroke="var(--muted)" stroke-width="1"/>';
+  (opt.marks||[]).forEach(mk=>{ s+='<line x1="'+x(mk.k)+'" x2="'+x(mk.k)+'" y1="'+m.t+'" y2="'+(m.t+ih)+'" stroke="var(--muted)" stroke-dasharray="2 3"/><text x="'+(x(mk.k)+5)+'" y="'+(m.t+12)+'">'+mk.label+'</text>'; });
+  opt.series.forEach(se=>{
+    let d=''; se.vals.forEach((v,idx)=>{ const k=opt.x0+idx; if(k>opt.x1||v==null) return; d+=(d?'L':'M')+x(k).toFixed(1)+' '+y(v).toFixed(1); });
+    s+='<path d="'+d+'" fill="none" stroke="var('+se.c+')" stroke-width="'+(se.w||2.2)+'" stroke-linejoin="round" stroke-linecap="round"'+(se.dash?' stroke-dasharray="5 4"':'')+'/>';
+    if(se.end!=null){ s+='<circle cx="'+x(se.end)+'" cy="'+y(se.vals[se.end-opt.x0]||0)+'" r="4" fill="var('+se.c+')" stroke="var(--surface)" stroke-width="2"/>'; }
+  });
+  s+='<line id="hv" x1="0" x2="0" y1="'+m.t+'" y2="'+(m.t+ih)+'" stroke="var(--ink)" stroke-width="1" opacity="0"/>';
+  s+='<rect x="'+m.l+'" y="'+m.t+'" width="'+iw+'" height="'+ih+'" fill="transparent" class="hit"/></svg><div class="tip" hidden></div>';
+  host.innerHTML=s;
+  const svg=host.querySelector('svg'), tip=host.querySelector('.tip'), hv=host.querySelector('#hv');
+  function move(ev){
+    const r=svg.getBoundingClientRect(), px=(ev.clientX-r.left)*(W/r.width);
+    const k=Math.max(opt.x0,Math.min(opt.x1,Math.round(opt.x0+(px-m.l)/iw*(opt.x1-opt.x0))));
+    hv.setAttribute('x1',x(k)); hv.setAttribute('x2',x(k)); hv.setAttribute('opacity','.35');
+    tip.innerHTML='<div class="t">'+dLabel(k)+' · mês '+k+'</div>'+opt.series.filter(se=>!se.noTip).map(se=>{const v=se.vals[k-opt.x0]; return v==null?'':'<div class="r"><span style="color:var('+se.c+')">'+se.name+'</span><span>'+opt.tipFmt(v)+'</span></div>';}).join('');
+    tip.hidden=false;
+    const hx=(x(k)/W)*r.width, tw=tip.offsetWidth;
+    tip.style.left=(hx+tw+16>r.width? hx-tw-10 : hx+10)+'px'; tip.style.top='8px';
+  }
+  svg.addEventListener('pointermove',move);
+  svg.addEventListener('pointerleave',()=>{tip.hidden=true; hv.setAttribute('opacity','0');});
+}
+
+/* ---------- render ---------- */
+let last=null;
+function render(){
+  const p=P, N=horizonN(p), H=Math.round(p.horiz)*12;
+  const res=STRATS.map(s=>Object.assign({},s,sim(p,s.id,N)));
+  res.forEach(r=>r.nw=nwAt(r,H));
+  const base=res[0];
+  const paid=res.filter(r=>r.payoff!=null);
+  const fastest=paid.length?Math.min(...paid.map(r=>r.payoff)):null;
+  const bestNW=Math.max(...res.map(r=>r.nw));
+  last={res,N,H};
+
+  // cards
+  document.getElementById('cards').innerHTML=res.map(r=>{
+    const b=[]; if(r.payoff!=null && r.payoff===fastest && r.id!=='base') b.push('Quita antes'); if(Math.abs(r.nw-bestNW)<1) b.push('Mais patrimônio');
+    const quit=r.payoff==null?'—':dLabel(r.payoff);
+    return '<button type="button" class="card" data-s="'+r.id+'" aria-pressed="'+(r.id===tabStrat)+'">'
+      +'<div class="nm"><span class="dot" style="background:var('+r.c+')"></span>'+r.nm+'</div>'
+      +'<div class="ds">'+r.ds+'</div>'
+      +'<div class="badges">'+b.map(t=>'<span class="badge">'+t+'</span>').join('')+'</div>'
+      +'<div class="big">'+quit+'<small>'+(r.payoff==null?'não quita no período':dur(r.payoff))+'</small></div>'
+      +'<div class="kv">'
+      +'<div><span>Juros pagos</span><span>'+brl.format(r.juros)+'</span></div>'
+      +'<div><span>Economia de juros</span><span>'+(r.id==='base'?'—':brl.format(base.juros-r.juros))+'</span></div>'
+      +'<div><span>Patrimônio em '+p.horiz+' anos</span><span>'+brl.format(r.nw)+'</span></div>'
+      +'</div></button>';
+  }).join('');
+  document.querySelectorAll('.card').forEach(c=>c.addEventListener('click',()=>{tabStrat=c.dataset.s; render();}));
+
+  // insight
+  const ranked=[...res].sort((a,b)=>b.nw-a.nw), best=ranked[0], second=ranked[1];
+  const fast=res.find(r=>r.payoff===fastest && r.id!=='base');
+  const r0=res[1].rows[0];
+  const gap0=(Math.pow(1+r0.ri,12)-1)-(Math.pow(1+r0.custo,12)-1);
+  let cross=null; for(const row of res[1].rows){ if(row.ri<row.custo){cross=row.k;break;} }
+  let txt='Parcela estimada hoje: <b>'+brl2.format(base.parcela0)+'</b>. ';
+  if(fast) txt+='O caminho mais rápido é <b>'+fast.nm.toLowerCase()+'</b>, quitando em <b>'+dLabel(fast.payoff)+'</b> ('+dur(fast.payoff)+'), contra '+(base.payoff?dLabel(base.payoff):'o fim do prazo')+' pagando só a parcela. ';
+  txt+='Em '+p.horiz+' anos, quem fica com mais patrimônio é <b>'+best.nm.toLowerCase()+'</b>, '+brl.format(best.nw-second.nw)+' à frente de '+second.nm.toLowerCase()+'. ';
+  txt+= gap0>0 ? 'Hoje o investimento rende '+pct(gap0)+' a.a. acima do custo da dívida'+(cross?', vantagem que acaba por volta de '+dLabel(cross)+'.':' durante todo o período.')
+               : 'Hoje a dívida custa mais que o investimento rende, então amortizar já é a melhor aplicação.';
+  document.getElementById('insight').innerHTML=txt;
+
+  // chart 1
+  const zx1 = zoom==='quit' ? Math.max(24, Math.min(N, Math.max(...res.filter(r=>r.id!=='base'&&r.payoff).map(r=>r.payoff),24)+12)) : Math.min(N, (base.payoff||N)+6);
+  const ser=res.map(r=>({name:r.nm,c:r.c,vals:r.rows.map(x=>x.B),end:r.payoff&&r.payoff<=zx1?r.payoff:null,w:r.id===tabStrat?3:2}));
+  ser.sort((a,b)=>(a.w||0)-(b.w||0)); const inv=res[2]; ser.push({name:'Investido (investir e quitar)',c:inv.c,dash:true,w:1.6,vals:inv.rows.map(x=>x.B>0?x.inv:null)});
+  const vals0=[p.saldo].concat(ser.flatMap(s=>s.vals.slice(0,zx1).filter(v=>v!=null)));
+  const ymax=Math.max(...vals0)*1.04;
+  const c1=['<span style="color:var(--s-base)"><i></i>Só a parcela</span>','<span style="color:var(--s-amort)"><i></i>Amortizar</span>','<span style="color:var(--s-inv)"><i></i>Investir e quitar</span>','<span style="color:var(--s-inv)"><i class="dash"></i>Valor investido para quitar</span>','<span style="color:var(--s-hib)"><i></i>Híbrido</span>'];
+  document.getElementById('legend1').innerHTML=c1.join('');
+  lineChart(document.getElementById('chart1'),{aria:'Saldo devedor por estratégia',x0:1,x1:zx1,y0:0,y1:ymax,series:ser,
+    yFmt:v=>v>=1000?(v/1000).toLocaleString('pt-BR',{maximumFractionDigits:0})+' mil':String(v), tipFmt:v=>brl.format(v)});
+
+  // chart 2
+  const rowsC=res[1].rows, X2=Math.min(60,N);
+  const sc=[{name:'Custo da dívida',c:'--s-amort',vals:rowsC.slice(0,X2).map(r=>Math.pow(1+r.custo,12)-1)},
+            {name:'Rendimento líquido',c:'--s-inv',vals:rowsC.slice(0,X2).map(r=>Math.pow(1+r.ri,12)-1)}];
+  const all2=sc.flatMap(s=>s.vals); const lo=Math.min(...all2), hi=Math.max(...all2), pad=(hi-lo)*0.25||0.01;
+  document.getElementById('legend2').innerHTML='<span style="color:var(--s-amort)"><i></i>Custo efetivo da dívida (juros + TR, a.a.)</span><span style="color:var(--s-inv)"><i></i>Rendimento líquido do investimento (a.a.)</span>';
+  lineChart(document.getElementById('chart2'),{aria:'Custo da dívida contra rendimento do investimento',x0:1,x1:X2,y0:Math.max(0,lo-pad),y1:hi+pad,series:sc,
+    marks:cross&&cross<=X2?[{k:cross,label:'cruzamento: '+dLabel(cross)}]:[],
+    yFmt:v=>(v*100).toLocaleString('pt-BR',{maximumFractionDigits:1})+'%', tipFmt:v=>pct(v)});
+
+  renderMeta(); renderTable(); renderBand();
+}
+
+/* ---------- faixa do siricotico ---------- */
+const FIN=250200;
+function impulso(valor){
+  const N=last.N, r=last.res.find(x=>x.id===planId());
+  const q=Object.assign({},P,{reserva:P.reserva+valor,usarReserva:P.usarReserva+valor});
+  const s=sim(q,r.id,N);
+  return {juros:Math.max(0,r.juros-s.juros), meses:(r.payoff&&s.payoff)?Math.max(0,r.payoff-s.payoff):0};
+}
+function planId(){ return tabStrat==='base'?'amort':tabStrat; }
+function renderBand(){
+  const r=last.res.find(x=>x.id===planId()), base=last.res[0];
+  const nm={amort:'amortizar todo mês',invest:'investir e quitar',hib:'híbrido'}[r.id];
+  document.getElementById('b0plan').textContent='"'+nm+'"';
+  document.getElementById('b0data').textContent=r.payoff?dLabel(r.payoff).replace(/\/(\d\d)$/,'/20$1'):'—';
+  document.getElementById('b0meses').textContent=r.payoff?dur(r.payoff):'mais do que o período simulado';
+  const i1=impulso(1000);
+  document.getElementById('b2j').textContent=brl.format(i1.juros);
+  document.getElementById('b2s').innerHTML=i1.meses>0?'E atrasa a quitação em <b>'+dur(i1.meses)+'</b>.':'O dinheiro sai uma vez; os juros sobre ele continuam correndo todo mês até a quitação.';
+  document.getElementById('b3').textContent=brl.format(Math.max(0,base.juros-r.juros));
+  document.getElementById('b3fim').textContent=base.payoff?dLabel(base.payoff).replace(/\/(\d\d)$/,'/20$1'):'o fim do prazo';
+  const pq=Math.max(0,Math.min(1,(FIN-P.saldo)/FIN));
+  document.getElementById('b4p').textContent=(pq*100).toLocaleString('pt-BR',{maximumFractionDigits:1})+'%';
+  document.getElementById('b4bar').style.width=(pq*100)+'%';
+  document.getElementById('b4s').innerHTML='Faltam <b>'+brl.format(P.saldo)+'</b>. No plano atual, esta barra chega a 100% em <b>'+(r.payoff?dLabel(r.payoff):'—')+'</b>.';
+  renderCalc();
+}
+function renderCalc(){
+  if(!last) return;
+  const v=Math.max(0,parseFloat(document.getElementById('gasto').value)||0), out=document.getElementById('b1txt');
+  if(!v){out.textContent='Digite o valor da compra para ver quanto ela custa de verdade.';return;}
+  const im=impulso(v), budget=last.res[0].parcela0+P.aporte, dias=Math.round(v/budget*30);
+  out.innerHTML='Se esse dinheiro fosse para o saldo devedor, economizaria <b>'+brl.format(im.juros)+'</b> de juros'
+    +(im.meses>0?' e anteciparia a quitação em <b>'+dur(im.meses)+'</b>':'')+'. '
+    +'Equivale a <b>'+(dias<1?'menos de 1 dia':dias+(dias>1?' dias':' dia'))+'</b> de tudo que vocês separam por mês para a casa.';
+}
+document.getElementById('gasto').addEventListener('input',renderCalc);
+(function carousel(){
+  const slides=[...document.querySelectorAll('#bTrack .slide')], dots=document.getElementById('bDots'), bar=document.getElementById('bBar'), band=document.getElementById('band');
+  const DUR=7000, reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let idx=0, t0=performance.now(), paused=false, raf;
+  dots.innerHTML=slides.map((_,i)=>'<button type="button" aria-label="Item '+(i+1)+'"></button>').join('');
+  const db=[...dots.children];
+  function go(n){ idx=(n+slides.length)%slides.length; slides.forEach((s,i)=>s.hidden=i!==idx); db.forEach((d,i)=>d.setAttribute('aria-current',i===idx)); t0=performance.now(); }
+  db.forEach((d,i)=>d.addEventListener('click',()=>go(i)));
+  document.getElementById('bPrev').addEventListener('click',()=>go(idx-1));
+  document.getElementById('bNext').addEventListener('click',()=>go(idx+1));
+  band.addEventListener('pointerenter',()=>paused=true); band.addEventListener('pointerleave',()=>{paused=false;t0=performance.now();});
+  band.addEventListener('focusin',()=>paused=true); band.addEventListener('focusout',()=>{paused=false;t0=performance.now();});
+  function tick(now){ if(paused||reduce){ t0=now-(paused?(parseFloat(bar.style.width)||0)/100*DUR:0); } else { const f=(now-t0)/DUR; if(f>=1) go(idx+1); bar.style.width=Math.min(100,f*100)+'%'; } raf=requestAnimationFrame(tick); }
+  go(0); raf=requestAnimationFrame(tick);
+})();
+
+function renderMeta(){
+  const p=P, out=document.getElementById('metaOut'), alvo=Math.round(parseFloat(document.getElementById('meta').value)||0)*12;
+  if(!alvo){out.textContent='';return;}
+  const N=Math.max(alvo+1, Math.round(p.meses)+2);
+  const ok=a=>{const r=sim(p,'amort',N,a); return r.payoff!=null && r.payoff<=alvo;};
+  if(ok(0)){ out.innerHTML='Com essas premissas já dá para quitar em '+(alvo/12)+' anos <b>sem aporte extra</b>.'; return; }
+  let lo=0, hi=Math.max(p.saldo,1000); if(!ok(hi)){ out.textContent='Prazo curto demais para essas premissas.'; return; }
+  for(let t=0;t<40;t++){ const mid=(lo+hi)/2; if(ok(mid)) hi=mid; else lo=mid; }
+  const need=Math.ceil(hi/10)*10, diff=need-p.aporte;
+  out.innerHTML='Aporte necessário: <b>'+brl.format(need)+'/mês</b><br><span style="color:var(--muted);font-size:13px">'
+    +(diff>0? brl.format(diff)+' a mais que o aporte atual de '+brl.format(p.aporte)+'.' : 'O aporte atual de '+brl.format(p.aporte)+' já cobre essa meta.')
+    +' Quitação até '+dLabel(alvo)+'.</span>';
+}
+document.getElementById('meta').addEventListener('input',renderMeta);
+
+function renderTable(){
+  const seg=document.getElementById('tabSeg');
+  seg.innerHTML=STRATS.map(s=>'<button type="button" data-s="'+s.id+'" aria-pressed="'+(s.id===tabStrat)+'">'+s.nm+'</button>').join('');
+  seg.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{tabStrat=b.dataset.s; render();}));
+  const r=last.res.find(x=>x.id===tabStrat), endK=Math.min(last.N, Math.max(r.payoff||last.N, last.H));
+  const years={};
+  r.rows.slice(0,endK).forEach(x=>{ const y=dateOf(x.k).y; const o=years[y]||(years[y]={y,parc:0,J:0,ext:0,fgu:0,B:0,inv:0,done:false});
+    o.parc+=x.parc; o.J+=x.J; o.ext+=x.ext; o.fgu+=x.fgu; o.B=x.B; o.inv=x.inv+x.res; if(r.payoff===x.k) o.done=true; });
+  let h='<thead><tr><th>Ano</th><th>Parcelas pagas</th><th>Juros</th><th>Amortização extra</th><th>FGTS usado</th><th>Saldo no fim</th><th>Investido + reserva</th></tr></thead><tbody>';
+  Object.values(years).forEach(o=>{ h+='<tr'+(o.done?' class="done"':'')+'><td>'+o.y+(o.done?' · quitado':'')+'</td><td>'+brl.format(o.parc)+'</td><td>'+brl.format(o.J)+'</td><td>'+brl.format(o.ext)+'</td><td>'+brl.format(o.fgu)+'</td><td>'+brl.format(o.B)+'</td><td>'+brl.format(o.inv)+'</td></tr>'; });
+  document.getElementById('tbl').innerHTML=h+'</tbody>';
+}
+
+function setZoom(z){zoom=z; document.getElementById('z-quit').setAttribute('aria-pressed',z==='quit'); document.getElementById('z-all').setAttribute('aria-pressed',z==='all'); render();}
+document.getElementById('z-quit').addEventListener('click',()=>setZoom('quit'));
+document.getElementById('z-all').addEventListener('click',()=>setZoom('all'));
+let rt; window.addEventListener('resize',()=>{clearTimeout(rt); rt=setTimeout(render,120);});
+render();
+})();
+</script>
+</body>
+</html>
